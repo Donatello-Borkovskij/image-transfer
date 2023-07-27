@@ -40,7 +40,7 @@
      <string>Copy to path</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="image_directory_2">
+   <widget class="QLineEdit" name="image_dir">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -50,7 +50,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="destination_directory_2">
+   <widget class="QLineEdit" name="destination_dir">
     <property name="geometry">
      <rect>
       <x>10</x>
