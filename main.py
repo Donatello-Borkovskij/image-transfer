@@ -7,14 +7,14 @@ import start_ui
 
 def main():
     app = QApplication(sys.argv)
-    mainwindow = start_ui.StartGUI()
-    widget = QtWidgets.QStackedWidget()
-    widget.addWidget(mainwindow)
-    widget.setWindowTitle('image-transfer-to-USB')
-    widget.show()
+    # mainwindow = start_ui.StartGUI()
+    # widget = QtWidgets.QStackedWidget()
+    # widget.addWidget(mainwindow)
+    # widget.setWindowTitle('image-transfer-to-USB')
+    # widget.show()
+    window = start_ui.StartGUI()
 
     sys.exit(app.exec_())
-    print(source_dir)
 
 
 if __name__ == '__main__':
