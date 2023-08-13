@@ -33,7 +33,7 @@ class StartGUI(QtWidgets.QMainWindow):
         self.destination_dir.setText(dir_name)
 
     def start_pressed(self):
-        self.new_window = image_frame.ImageFrame()
+        self.new_window = image_frame.ImageFrame(self.sorted_image_files, self.destination_dir.text())
         self.close()
 
     def get_sorted_images(self):
