@@ -47,3 +47,5 @@ class ImageFrame(QtWidgets.QMainWindow):
         elif event.key() == Qt.Key_Right:
             self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
             self.update_image()
+        elif event.key() == Qt.Key_Up:
+            pass
