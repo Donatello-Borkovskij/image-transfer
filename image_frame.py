@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QVBoxLayout, QWi
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtCore import Qt
+import shutil
 import sys
 
 
@@ -48,4 +49,11 @@ class ImageFrame(QtWidgets.QMainWindow):
             self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
             self.update_image()
         elif event.key() == Qt.Key_Up:
-            pass
+            self.copy_image_to_directory(self.image_paths[self.current_image_index][0], self.directory)
+
+    def copy_image_to_directory(self, image_path, target_directory):
+        try:
+            shutil.copy(image_path, target_directory)
+            print(f"Image copied to {target_directory}")
+        except Exception as e:
+            print("Error:", e)
