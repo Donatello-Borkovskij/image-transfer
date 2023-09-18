@@ -5,6 +5,7 @@ import image_frame
 import os
 from PIL import Image
 from datetime import datetime
+import time
 
 
 class StartGUI(QtWidgets.QMainWindow):
@@ -53,6 +54,24 @@ class StartGUI(QtWidgets.QMainWindow):
                             if creation_date:
                                 creation_date = datetime.strptime(creation_date, "%Y:%m:%d %H:%M:%S")
                                 image_files.append((file_path, creation_date))
+                            else:
+                                print("Tag 36867 not found in EXIF data.")
+                                # creation_date = os.path.getctime(file_path)
+                                # image_files.append((file_path, creation_date))
+
+                                modification_time = os.path.getmtime(file_path)
+                                modification_date = time.strftime("%Y-%m-%d %H:%M:%S",
+                                                                  time.localtime(modification_time))
+                                image_files.append((file_path, modification_date))
+                        else:
+                            print("No EXIF data found in the image.")
+                            # creation_date = os.path.getctime(file_path)
+                            # image_files.append((file_path, creation_date))
+
+                            modification_time = os.path.getmtime(file_path)
+                            modification_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modification_time))
+                            image_files.append((file_path, modification_date))
+
                 except (IOError, AttributeError):
                     pass
             elif file_name.lower().endswith(".png"):
