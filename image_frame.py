@@ -1,10 +1,18 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QVBoxLayout, QWidget, QLabel
 from PyQt5.uic import loadUi
-from PyQt5.QtGui import QPixmap, QTransform
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap, QTransform, QImage
+from PyQt5.QtCore import Qt, QSize
 import shutil
 import sys
+
+
+def copy_image_to_directory(image_path, target_directory):
+    try:
+        shutil.copy(image_path, target_directory)
+        print(f"Image copied to {target_directory}")
+    except Exception as e:
+        print("Error:", e)
 
 
 class ImageFrame(QtWidgets.QMainWindow):
@@ -19,41 +27,37 @@ class ImageFrame(QtWidgets.QMainWindow):
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout(self.central_widget)
 
         self.image_label = QLabel(self)
-        self.layout.addWidget(self.image_label)
+        self.image_label.setAlignment(Qt.AlignCenter)
 
-        self.update_image()
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.image_label)
+        self.central_widget.setLayout(self.layout)
+
         self.showMaximized()
+        self.update_image()
 
     def update_image(self):
-        pixmap = QPixmap(self.image_paths[self.current_image_index][0])
+        image_path = self.image_paths[self.current_image_index][0]
+        original_image = QImage(image_path)
 
-        max_width = self.central_widget.width()
-        max_height = self.central_widget.height()
+        scale_size = QSize(self.centralWidget().width()-50, self.centralWidget().height()-50)
 
-        transform = QTransform().rotate(90)
-        rotated_pixmap = pixmap.transformed(transform, Qt.SmoothTransformation)
+        scaled_image = original_image.scaled(scale_size, Qt.KeepAspectRatio)
 
-        scaled_pixmap = rotated_pixmap.scaled(max_width, max_height, Qt.KeepAspectRatio)
+        pixmap = QPixmap.fromImage(scaled_image)
 
-        self.image_label.setPixmap(scaled_pixmap)
-        self.layout.setAlignment(Qt.AlignCenter)
+        self.image_label.setPixmap(pixmap)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
             self.current_image_index = (self.current_image_index - 1) % len(self.image_paths)
+            # self.current_image_index = (self.current_image_index - 1)
             self.update_image()
         elif event.key() == Qt.Key_Right:
             self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)
+            # self.current_image_index = (self.current_image_index + 1)
             self.update_image()
         elif event.key() == Qt.Key_Up:
-            self.copy_image_to_directory(self.image_paths[self.current_image_index][0], self.directory)
-
-    def copy_image_to_directory(self, image_path, target_directory):
-        try:
-            shutil.copy(image_path, target_directory)
-            print(f"Image copied to {target_directory}")
-        except Exception as e:
-            print("Error:", e)
+            copy_image_to_directory(self.image_paths[self.current_image_index][0], self.directory)
