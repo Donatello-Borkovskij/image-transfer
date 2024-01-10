@@ -1,11 +1,10 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from PyQt5.uic import loadUi
 import image_frame
 import os
 from PIL import Image
 from datetime import datetime
-import time
 
 
 class StartGUI(QtWidgets.QMainWindow):
@@ -39,13 +38,14 @@ class StartGUI(QtWidgets.QMainWindow):
 
     def get_sorted_images(self):
         directory_path = self.image_dir.text()
-
         files = os.listdir(directory_path)
 
         image_files = []
+
         for file_name in files:
-            if file_name.lower().endswith(".jpg"):
+            if file_name.lower().endswith((".jpg", ".png")):
                 file_path = os.path.join(directory_path, file_name)
+
                 try:
                     with Image.open(file_path) as img:
                         exif_data = img._getexif()
@@ -54,35 +54,20 @@ class StartGUI(QtWidgets.QMainWindow):
                             if creation_date:
                                 creation_date = datetime.strptime(creation_date, "%Y:%m:%d %H:%M:%S")
                                 image_files.append((file_path, creation_date))
-                            else:
-                                print("Tag 36867 not found in EXIF data.")
-                                # creation_date = os.path.getctime(file_path)
-                                # image_files.append((file_path, creation_date))
+                                continue  # Skip adding the same image with creation date
 
-                                modification_time = os.path.getmtime(file_path)
-                                modification_date = time.strftime("%Y-%m-%d %H:%M:%S",
-                                                                  time.localtime(modification_time))
-                                image_files.append((file_path, modification_date))
-                        else:
-                            print("No EXIF data found in the image.")
-                            # creation_date = os.path.getctime(file_path)
-                            # image_files.append((file_path, creation_date))
+                except (IOError, AttributeError) as e:
+                    print(f"Error processing file {file_name}: {e}")
 
-                            modification_time = os.path.getmtime(file_path)
-                            modification_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modification_time))
-                            image_files.append((file_path, modification_date))
+                # For images without EXIF or creation date, use modification date
+                modification_time = os.path.getmtime(file_path)
+                modification_date = datetime.fromtimestamp(modification_time)
+                image_files.append((file_path, modification_date))
 
-                except (IOError, AttributeError):
-                    pass
-            elif file_name.lower().endswith(".png"):
-                file_path = os.path.join(directory_path, file_name)
-                try:
-                    modification_date = datetime.fromtimestamp(os.path.getmtime(file_path))
-                    image_files.append((file_path, modification_date))
-                except (IOError, AttributeError):
-                    pass
+        # Sort the image files prioritizing EXIF creation date over modification date
+        self.sorted_image_files = sorted(image_files, key=lambda x: x[1] if x[1] != None else datetime.min,
+                                         reverse=True)
 
-        self.sorted_image_files = sorted(image_files, key=lambda x: x[1], reverse=True)
+        for file_path, date in self.sorted_image_files:
+            print(f"File: {file_path}, Date: {date}")
 
-        for file_path, creation_date in self.sorted_image_files:
-            print(f"File: {file_path}, Creation Date: {creation_date}")
