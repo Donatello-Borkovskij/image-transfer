@@ -1,4 +1,4 @@
-# image-transfer-to-USB-QT
+# image-transfer
 
 transfers images from source directory to destination directory.
 
